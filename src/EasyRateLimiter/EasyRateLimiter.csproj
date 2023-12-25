@@ -13,7 +13,7 @@
         <Title>Rate Limiting Configurable</Title>
         <PackageTags>Pandatech, library, rate-limiting, configurable, MemoryCache, Redis</PackageTags>        
         <Description>Rate limiting NuGet package which is configurable and simple</Description>
-        <RepositoryUrl>https://github.com/PandaTechAM/be-lib-rate-limiting</RepositoryUrl>
+        <RepositoryUrl>https://github.com/PandaTechAM/be-lib-easy-rate-limiter</RepositoryUrl>
         <PackageReleaseNotes>InitialCommit</PackageReleaseNotes>
     </PropertyGroup>
 
