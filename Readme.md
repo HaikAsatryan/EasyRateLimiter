@@ -1,6 +1,5 @@
 # 1. Pandatech.EasyRateLimiter
 
-## 1.1. Introduction- [1. Pandatech.EasyRateLimiter](#1-pandatecheasyratelimiter)
 - [1. Pandatech.EasyRateLimiter](#1-pandatecheasyratelimiter)
   - [1.1. Introduction- 1. Pandatech.EasyRateLimiter](#11-introduction--1-pandatecheasyratelimiter)
   - [1.2. Installation](#12-installation)
@@ -12,7 +11,7 @@
   - [1.6. Limitations](#16-limitations)
   - [1.7. License](#17-license)
 
-
+## 1.1. Introduction
 **Pandatech.EasyRateLimiter** is a lightweight, efficient, and versatile NuGet package tailored for implementing rate limiting in .NET applications. Key features include:
 
 - **Dual Functionality:** Offers both basic and distributed (Redis-backed) rate limiting, accommodating a wide range of use cases.
