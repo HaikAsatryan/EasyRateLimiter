@@ -19,9 +19,10 @@ public class MemoryCacheRepository(IMemoryCache cache) : ICacheRepository
         return Task.FromResult(trySuccess ? value : null);
     }
 
-    public async Task UpdateCacheEntryAsync(string key, List<DateTime> value, TimeSpan cacheTimeSpan)
+    public Task UpdateCacheEntryAsync(string key, List<DateTime> value, TimeSpan cacheTimeSpan)
     {
-        await CreateCacheEntryAsync(key, value, cacheTimeSpan);
+        CreateCacheEntryAsync(key, value, cacheTimeSpan);
+        return Task.CompletedTask;
     }
 
     public Task DeleteCacheEntryAsync(string key)

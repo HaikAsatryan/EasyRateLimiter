@@ -68,10 +68,10 @@ public class RedisCacheRepository(
 
     private async Task<bool> TryAcquireLockWithRetriesAsync(string lockKey, TimeSpan maxLockTime)
     {
-        const int maxRetries = 10;
+        const int maxRetries = 3;
 
         var attempt = 0;
-        var retryDelay = TimeSpan.FromMilliseconds(1);
+        var retryDelay = TimeSpan.FromMilliseconds(5);
 
         while (attempt < maxRetries)
         {

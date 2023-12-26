@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using EasyRateLimiter.Options;
 using EasyRateLimiter.Repositories;
+using EasyRateLimiter.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 

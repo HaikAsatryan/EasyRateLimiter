@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace EasyRateLimiter.Options;
+﻿namespace EasyRateLimiter.Options;
 
 public class RateLimiterOptions
 {

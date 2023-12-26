@@ -9,18 +9,18 @@ builder.AddInMemoryDb()
     .AddResponseCrafter();
 
 
-builder.AddRateLimiter();
-var redisConnectionString = builder.Configuration["Redis:ConnectionString"];
-builder.AddDistributedRateLimiter();
-builder.AddDistributedRateLimiter(redisConnectionString!); //from nuget package
+//builder.AddRateLimiter();
+
+builder.AddDistributedRateLimiter(); //from nuget package
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseIpRateLimiter(); //from nuget package
-app.UseClientRateLimiter();
+
 app.UseStaticFiles();
+
 app.UseResponseCrafter()
     .MigrateDatabase()
     .UsePandaSwagger();

@@ -1,5 +1,4 @@
-﻿using EasyRateLimiter.Demo.Filters;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace EasyRateLimiter.Demo.Extensions;

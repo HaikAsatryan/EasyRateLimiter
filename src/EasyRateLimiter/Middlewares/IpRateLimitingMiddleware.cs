@@ -5,6 +5,7 @@ using EasyRateLimiter.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using EasyRateLimiter.Helpers;
+using EasyRateLimiter.Services;
 
 namespace EasyRateLimiter.Middlewares;
 
@@ -42,8 +43,8 @@ public class IpRateLimitingMiddleware(
         }
 
         sp.Stop();
-        logger.LogInformation("IpRateLimiter middleware validated rate in {TotalMicroseconds} microseconds",
-            sp.Elapsed.TotalMilliseconds); //todo only for testing delete at the end
+        // logger.LogInformation("IpRateLimiter middleware validated rate in {TotalMicroseconds} milliseconds",
+        //     sp.Elapsed.TotalMilliseconds); //todo only for testing delete at the end
         await next(context);
     }
 }

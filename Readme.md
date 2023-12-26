@@ -119,11 +119,11 @@ builder.AddDistributedRateLimiter(redisConnectionString!);
 
 Our performance benchmarks provide a clear understanding of what to expect in terms of efficiency and resource utilization:
 
-- **Standard Rate Limiter (`builder.AddRateLimiter();`):** In scenarios with over 30 endpoints, each receiving 1 request per second, the average processing time per request is approximately 0.5 milliseconds. This indicates a high level of efficiency, especially in applications with moderate to high traffic.
+- **Standard Rate Limiter (`builder.AddRateLimiter();`):** In scenarios with over 30 endpoints, each receiving 1 request per second, the average processing time per request is approximately 4.5 milliseconds. This indicates a high level of efficiency, especially in applications with moderate to high traffic.
 
 - **Distributed Rate Limiter (`builder.AddDistributedRateLimiter();`):** Under similar conditions, the average time for processing each request is about 10 milliseconds. This slightly higher response time is due to the nature of distributed systems and network latency involved in communicating with Redis.
 
-- **Memory Footprint:** Both standard and distributed versions maintain a minimal memory footprint. The estimated memory usage is roughly 1.4 bytes per cache record, translating to a maximum of around 3KB for 30+ endpoints under continuous use. This efficient memory usage is vital for applications where resource optimization is critical.
+- **Memory Footprint:** Both standard and distributed versions maintain a minimal memory footprint. The estimated memory usage is roughly 20 bytes per cache record, translating to a maximum of around 1MB RAM for 30+ endpoints under continuous use. This efficient memory usage is vital for applications where resource optimization is critical.
 
 - **Comparative Analysis:** Compared to other rate limiting solutions, Pandatech.EasyRateLimiter stands out for its simplicity and low overhead. While it may not employ complex algorithms like token bucket or sliding windows, its performance is well-suited for a wide range of applications, especially where ease of use and integration are priorities.
 
@@ -132,6 +132,7 @@ In summary, Pandatech.EasyRateLimiter provides an optimal balance between perfor
 ## 1.6. Limitations
 
 Pandatech.EasyRateLimiter does not implement advanced algorithms like token bucket or sliding windows. It currently supports .NET 8+ environments only.
+**DISTRIBUTED RATE LIMITING IS IN BETA AND NOT READY FOR PRODUCTION.** It works stable till 20 requests per second but higher than that there are thread locking issues and some requests are passing through validation.**
 
 ## 1.7. License
 

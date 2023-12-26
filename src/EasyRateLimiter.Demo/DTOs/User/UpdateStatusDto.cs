@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using EasyRateLimiter.Demo.Enums;
 
 namespace EasyRateLimiter.Demo.DTOs.User

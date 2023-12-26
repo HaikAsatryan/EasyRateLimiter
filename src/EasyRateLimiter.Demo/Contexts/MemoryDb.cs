@@ -1,6 +1,5 @@
 ﻿using EasyRateLimiter.Demo.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace EasyRateLimiter.Demo.Contexts;
 

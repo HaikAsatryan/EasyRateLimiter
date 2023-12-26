@@ -4,7 +4,6 @@ using EasyRateLimiter.Demo.DTOs.Authentication;
 using EasyRateLimiter.Demo.DTOs.Token;
 using EasyRateLimiter.Demo.DTOs.User;
 using EasyRateLimiter.Demo.Enums;
-using EasyRateLimiter.Demo.Models;
 using EasyRateLimiter.Demo.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ResponseCrafter.StandardHttpExceptions;

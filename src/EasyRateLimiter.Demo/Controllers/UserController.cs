@@ -1,6 +1,5 @@
 using EasyRateLimiter.Demo.Attributes;
 using EasyRateLimiter.Demo.DTOs.User;
-using EasyRateLimiter.Demo.Filters;
 using EasyRateLimiter.Demo.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,6 +1,7 @@
 ﻿using EasyRateLimiter.Helpers;
 using EasyRateLimiter.Options;
 using EasyRateLimiter.Repositories;
+using EasyRateLimiter.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +17,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.CheckDuplicateRateLimiter();
         BindAndConfigureRateLimiterOptions(builder);
-        builder.Services.AddSingleton<RateLimitingService>();
-        builder.Services.AddMemoryCache();
-        builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
+        builder.RegisterRateLimiterServices();
         return builder;
     }
 
@@ -27,21 +26,19 @@ public static class WebApplicationBuilderExtensions
     {
         builder.CheckDuplicateRateLimiter();
         BindAndConfigureRateLimiterOptions(builder, setupAction);
-        builder.Services.AddSingleton<RateLimitingService>();
-        builder.Services.AddMemoryCache();
-        builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
+        builder.RegisterRateLimiterServices();
         return builder;
     }
 
     public static WebApplicationBuilder AddDistributedRateLimiter(this WebApplicationBuilder builder)
     {
-        var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
         builder.CheckDuplicateRateLimiter();
-        BindAndConfigureRateLimiterOptions(builder);
-        builder.Services.AddSingleton<RateLimitingService>();
-        //builder.Services.AddSingleton<ICacheRepository, RedisCacheRepository>(); //todo uncomment
-        builder.Services.AddSingleton<ICacheRepository, RedisCacheRepositoryNoLock>();
+
+        var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString!));
+
+        BindAndConfigureRateLimiterOptions(builder);
+        builder.RegisterDistributedRateLimiterServices();
 
         return builder;
     }
@@ -49,13 +46,13 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddDistributedRateLimiter(this WebApplicationBuilder builder,
         Action<RateLimiterOptions> setupAction)
     {
-        var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
-
         builder.CheckDuplicateRateLimiter();
-        BindAndConfigureRateLimiterOptions(builder, setupAction);
-        builder.Services.AddSingleton<RateLimitingService>();
-        builder.Services.AddSingleton<ICacheRepository, RedisCacheRepository>();
+
+        var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString!));
+        BindAndConfigureRateLimiterOptions(builder, setupAction);
+
+        builder.RegisterDistributedRateLimiterServices();
 
         return builder;
     }
@@ -65,10 +62,10 @@ public static class WebApplicationBuilderExtensions
         string redisConnectionString)
     {
         builder.CheckDuplicateRateLimiter();
-        BindAndConfigureRateLimiterOptions(builder);
-        builder.Services.AddSingleton<RateLimitingService>();
-        builder.Services.AddSingleton<ICacheRepository, RedisCacheRepository>();
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+        BindAndConfigureRateLimiterOptions(builder);
+        builder.RegisterDistributedRateLimiterServices();
+
 
         return builder;
     }
@@ -77,11 +74,27 @@ public static class WebApplicationBuilderExtensions
         string redisConnectionString, Action<RateLimiterOptions> setupAction)
     {
         builder.CheckDuplicateRateLimiter();
+        builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
         BindAndConfigureRateLimiterOptions(builder, setupAction);
+        builder.RegisterDistributedRateLimiterServices();
+        return builder;
+    }
+
+    private static WebApplicationBuilder RegisterRateLimiterServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<RateLimitingService>();
+        builder.Services.AddSingleton<IRateValidator, RateValidatorWithLock>();
+        builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
+        return builder;
+    }
+
+    private static WebApplicationBuilder RegisterDistributedRateLimiterServices(this WebApplicationBuilder builder)
+    {
+        var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
         builder.Services.AddSingleton<RateLimitingService>();
         builder.Services.AddSingleton<ICacheRepository, RedisCacheRepository>();
-        builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
-
+        builder.Services.AddSingleton<IRateValidator, RateValidator>();
         return builder;
     }
 

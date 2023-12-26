@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace EasyRateLimiter.Demo.DTOs.User
+﻿namespace EasyRateLimiter.Demo.DTOs.User
 {
     public class UpdatePasswordDto
     {
