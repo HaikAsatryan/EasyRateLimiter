@@ -1,7 +1,7 @@
-# 1. Pandatech.EasyRateLimiter
+# 1. EasyRateLimiter
 
-- [1. Pandatech.EasyRateLimiter](#1-pandatecheasyratelimiter)
-  - [1.1. Introduction- 1. Pandatech.EasyRateLimiter](#11-introduction--1-pandatecheasyratelimiter)
+- [1. EasyRateLimiter](#1-easyratelimiter)
+  - [1.1. Introduction](#11-introduction)
   - [1.2. Installation](#12-installation)
     - [1.2.1. Program.cs Example](#121-programcs-example)
     - [1.2.2. Appsettings.json Example](#122-appsettingsjson-example)
@@ -12,7 +12,7 @@
   - [1.7. License](#17-license)
 
 ## 1.1. Introduction
-**Pandatech.EasyRateLimiter** is a lightweight, efficient, and versatile NuGet package tailored for implementing rate limiting in .NET applications. Key features include:
+**EasyRateLimiter** is my project which I wanted to share as NuGet package but then realized that native microsoft solution is 4 times faster. Key features include:
 
 - **Dual Functionality:** Offers both basic and distributed (Redis-backed) rate limiting, accommodating a wide range of use cases.
 - **Ease of Integration:** Designed with simplicity in mind, it integrates seamlessly into existing projects with minimal configuration.
@@ -22,7 +22,7 @@
 
 ## 1.2. Installation
 
-To incorporate Pandatech.EasyRateLimiter into your project, you can choose between two primary methods of setup in your `program.cs`:
+To incorporate EasyRateLimiter into your project, you can choose between two primary methods of setup in your `program.cs`:
 
 - `builder.AddRateLimiter();`
 - `builder.AddDistributedRateLimiter();`
@@ -119,27 +119,20 @@ builder.AddDistributedRateLimiter(redisConnectionString!);
 
 Our performance benchmarks provide a clear understanding of what to expect in terms of efficiency and resource utilization:
 
-- **Standard Rate Limiter (`builder.AddRateLimiter();`):** In scenarios with over 30 endpoints, each receiving 1 request per second, the average processing time per request is approximately 4.5 milliseconds. This indicates a high level of efficiency, especially in applications with moderate to high traffic.
+- **Standard Rate Limiter (`builder.AddRateLimiter();`):** In scenarios with over 30 endpoints, each receiving 1 request per second, the average processing time per request is approximately 4.5 milliseconds (Can reach up to 9 ms on DDOS attacks). This is almost 7 times slower than System.Threading.RateLimiter.
 
-- **Distributed Rate Limiter (`builder.AddDistributedRateLimiter();`):** Under similar conditions, the average time for processing each request is about 10 milliseconds. This slightly higher response time is due to the nature of distributed systems and network latency involved in communicating with Redis.
+- **Distributed Rate Limiter (`builder.AddDistributedRateLimiter();`):** Under similar conditions, the average time for processing each request is about 10 milliseconds and can reach up to 80ms on DDOS attacks. This significantly higher response time is due to the nature of distributed systems and network latency involved in communicating with Redis. There are plenty of better solutions that's why this is just personal working.
 
-- **Memory Footprint:** Both standard and distributed versions maintain a minimal memory footprint. The estimated memory usage is roughly 20 bytes per cache record, translating to a maximum of around 1MB RAM for 30+ endpoints under continuous use. This efficient memory usage is vital for applications where resource optimization is critical.
+- **Memory Footprint:** Both standard and distributed versions maintain a minimal memory footprint. The estimated memory usage is roughly 20 bytes per request, translating to a maximum of around 1MB RAM for 30+ endpoints under continuous use. This efficient memory usage is vital for applications where resource optimization is critical.
 
-- **Comparative Analysis:** Compared to other rate limiting solutions, Pandatech.EasyRateLimiter stands out for its simplicity and low overhead. While it may not employ complex algorithms like token bucket or sliding windows, its performance is well-suited for a wide range of applications, especially where ease of use and integration are priorities.
+- **Comparative Analysis:** Compared to other rate limiting solutions, EasyRateLimiter stands out for its simplicity. While it may not employ complex algorithms like token bucket or concurrency, it has solid implementation of sliding window algorithm. As it is custom implementation its not as performant as Microsoft one.
 
-In summary, Pandatech.EasyRateLimiter provides an optimal balance between performance and ease of use, making it an excellent choice for developers looking to implement rate limiting in their .NET applications without incurring significant resource overhead.
 
 ## 1.6. Limitations
 
-Pandatech.EasyRateLimiter does not implement advanced algorithms like token bucket or sliding windows. It currently supports .NET 8+ environments only.
-**DISTRIBUTED RATE LIMITING IS IN BETA AND NOT READY FOR PRODUCTION.** It works stable till 20 requests per second but higher than that there are thread locking issues and some requests are passing through validation.**
+EasyRateLimiter does not implement advanced algorithms like token bucket or concurrency limiter. It currently supports .NET 8+ environments only.
+**Though this repo is super stable its not intended for production use** `RedisRateLimiting.AspNetCore` and `System.Threading.RateLimiting` are much better solutions in terms of performance. They are worse in terms of configuration and ease of use but it's totally subjective and depends on your use case.
 
 ## 1.7. License
 
-Pandatech.EasyRateLimiter is licensed under the MIT License.
-
-[![GitHub stars](https://img.shields.io/github/stars/pandatech/Public-API-Documentations.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/pandatech/Public-API-Documentations/stargazers/)
-
-[![GitHub forks](https://img.shields.io/github/forks/pandatech/Public-API-Documentations.svg?style=social&label=Fork&maxAge=2592000)](https://GitHub.com/pandatech/Public-API-Documentations/network/)
-
-[![GitHub issues](https://img.shields.io/github/issues/pandatech/Public-API-Documentations.svg)](https://GitHub.com/pandatech/Public-API-Documentations/issues/)
+EasyRateLimiter is licensed under the MIT License.

@@ -2,6 +2,6 @@
 
 public interface IRateValidator
 {
-    public Task<bool> CheckRateLimitAsync(string ipOrClientId, string endpoint, DateTime now,
+    public Task<bool> CheckRateLimitAsync(string ipOrClientId, string endpoint, long nowTicks,
         bool checkGlobalLimiting);
 }

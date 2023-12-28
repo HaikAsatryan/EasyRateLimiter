@@ -5,7 +5,7 @@ namespace EasyRateLimiter.Demo.Extensions;
 
 public static class EndpointExtensions
 {
-    public static void MapPandaStandardEndpoints(this WebApplication app)
+    public static void MapCustomEndpoints(this WebApplication app)
     {
         app.MapPingApi()
             .MapClientIdCheckEndpoint()
@@ -23,7 +23,7 @@ public static class EndpointExtensions
 
     private static WebApplication MapPingApi(this WebApplication app)
     {
-        app.MapGet("/above-board/ping", () => "pong").WithTags("Above Board");
+        app.MapGet("/above-board/ping", () => "pong").WithTags("Above Board").RequireRateLimiting("SlidingWindowLimiter");
         return app;
     }
 

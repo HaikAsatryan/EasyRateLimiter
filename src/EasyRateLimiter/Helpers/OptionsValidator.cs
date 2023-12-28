@@ -39,7 +39,7 @@ public static class OptionsValidator
                 throw new ArgumentException("Endpoint is required.");
             }
 
-            if (rule.PeriodTimeSpan <= TimeSpan.Zero)
+            if (rule.PeriodTicks <= 0)
             {
                 throw new ArgumentException("Period must be greater than zero.");
             }

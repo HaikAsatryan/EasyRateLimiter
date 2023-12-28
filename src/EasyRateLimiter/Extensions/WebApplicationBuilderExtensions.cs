@@ -83,9 +83,9 @@ public static class WebApplicationBuilderExtensions
     private static WebApplicationBuilder RegisterRateLimiterServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<RateLimitingService>();
-        builder.Services.AddSingleton<IRateValidator, RateValidatorWithLock>();
+        builder.Services.AddSingleton<IRateValidator, RateValidatorMemoryCache>();
         builder.Services.AddMemoryCache();
-        builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
+        builder.Services.AddSingleton<MemoryCacheRepository>();
         return builder;
     }
 
@@ -93,8 +93,8 @@ public static class WebApplicationBuilderExtensions
     {
         var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
         builder.Services.AddSingleton<RateLimitingService>();
-        builder.Services.AddSingleton<ICacheRepository, RedisCacheRepository>();
-        builder.Services.AddSingleton<IRateValidator, RateValidator>();
+        builder.Services.AddSingleton<RedisLuaRepository>();
+        builder.Services.AddSingleton<IRateValidator, RateValidatorRedis>();
         return builder;
     }
 
@@ -103,7 +103,9 @@ public static class WebApplicationBuilderExtensions
     {
         var options = new RateLimiterOptions();
         builder.Configuration.GetSection("RateLimiter").Bind(options, c => c.BindNonPublicProperties = true);
-        options.Rules.ForEach(rule => rule.PeriodTimeSpan = TimeSpanParser.Parse(rule.Period));
+        options.Rules.ForEach(rule => rule.PeriodTicks = TimeParser.ToTicks(rule.Period));
+        options.Rules.ForEach(rule => rule.PeriodTimeSpan = TimeParser.ToTimeSpan(rule.Period));
+        options.Rules.ForEach(rule => rule.PeriodSeconds = (int)rule.PeriodTimeSpan.TotalSeconds);
         setupAction.Invoke(options);
         OptionsValidator.Validate(options);
         options.EndpointWhitelist = EndpointListHelper.Build(options.IpWhitelist);
@@ -117,7 +119,9 @@ public static class WebApplicationBuilderExtensions
     {
         var options = new RateLimiterOptions();
         builder.Configuration.GetSection("RateLimiter").Bind(options, c => c.BindNonPublicProperties = true);
-        options.Rules.ForEach(rule => rule.PeriodTimeSpan = TimeSpanParser.Parse(rule.Period));
+        options.Rules.ForEach(rule => rule.PeriodTicks = TimeParser.ToTicks(rule.Period));
+        options.Rules.ForEach(rule => rule.PeriodTimeSpan = TimeParser.ToTimeSpan(rule.Period));
+        options.Rules.ForEach(rule => rule.PeriodSeconds = (int)rule.PeriodTimeSpan.TotalSeconds);
         OptionsValidator.Validate(options);
         options.EndpointWhitelist = EndpointListHelper.Build(options.EndpointWhitelist);
         var newRules = new List<RateLimitRule>();
@@ -129,7 +133,7 @@ public static class WebApplicationBuilderExtensions
                 newRules.AddRange(newEndpoints.Select(newEndpoint => new RateLimitRule
                 {
                     Endpoint = newEndpoint, Period = rule.Period, Limit = rule.Limit,
-                    PeriodTimeSpan = rule.PeriodTimeSpan
+                    PeriodTicks = rule.PeriodTicks
                 }));
             }
             else

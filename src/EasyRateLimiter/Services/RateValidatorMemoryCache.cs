@@ -4,16 +4,17 @@ using EasyRateLimiter.Repositories;
 
 namespace EasyRateLimiter.Services;
 
-public class RateValidatorWithLock(
-    ICacheRepository repository,
+public class RateValidatorMemoryCache(
+    MemoryCacheRepository repository,
     RateLimiterOptions options) : IRateValidator
 {
     private readonly object _lock = new();
 
-    public Task<bool> CheckRateLimitAsync(string ipOrClientId, string endpoint, DateTime now,
+    public Task<bool> CheckRateLimitAsync(string ipOrClientId, string endpoint, long nowTicks,
         bool checkGlobalLimiting)
     {
         TimeSpan maxExpiryTime;
+        long maxExpiryTicks;
 
         var key = checkGlobalLimiting ? ipOrClientId : $"{ipOrClientId}:{endpoint}";
 
@@ -25,34 +26,36 @@ public class RateValidatorWithLock(
         {
             case true when checkGlobalLimiting:
                 maxExpiryTime = options.Rules.Where(e => e.Endpoint == "*").Max(x => x.PeriodTimeSpan);
+                maxExpiryTicks = options.Rules.Where(e => e.Endpoint == "*").Max(x => x.PeriodTicks);
                 break;
             case true when !checkGlobalLimiting:
                 maxExpiryTime = options.Rules.Where(e => e.Endpoint == endpoint).Max(x => x.PeriodTimeSpan);
+                maxExpiryTicks = options.Rules.Where(e => e.Endpoint == endpoint).Max(x => x.PeriodTicks);
                 break;
             default:
                 return Task.FromResult(false);
         }
 
-        List<DateTime> cachedValues;
+        List<long> cachedValues;
         lock (_lock)
         {
-            var fetchedValues = repository.GetCacheEntriesAsync(key).Result;
+            var fetchedValues = repository.GetCacheEntriesAsync(key);
             cachedValues = fetchedValues ?? [];
 
-            cachedValues.Add(now);
+            cachedValues.Add(nowTicks);
             if (fetchedValues is null)
             {
-                repository.CreateCacheEntryAsync(key, cachedValues, maxExpiryTime).Wait();
+                repository.CreateCacheEntryAsync(key, cachedValues, maxExpiryTime);
             }
             else
             {
-                cachedValues = cachedValues.Where(x => x > now - maxExpiryTime).ToList();
-                repository.UpdateCacheEntryAsync(key, cachedValues, maxExpiryTime).Wait();
+                cachedValues = cachedValues.Where(x => x > nowTicks - maxExpiryTicks).ToList();
+                repository.UpdateCacheEntryAsync(key, cachedValues, maxExpiryTime);
             }
         }
 
         var isRuleViolated =
-            RuleCheckHelper.RulesAreViolated(options.Rules, endpoint, cachedValues, now, checkGlobalLimiting);
+            RuleCheckHelper.RulesAreViolated(options.Rules, endpoint, cachedValues, nowTicks, checkGlobalLimiting);
         return Task.FromResult(isRuleViolated);
     }
 }

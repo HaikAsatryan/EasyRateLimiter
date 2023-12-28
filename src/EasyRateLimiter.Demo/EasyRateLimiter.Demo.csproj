@@ -11,11 +11,24 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
         <PackageReference Include="Pandatech.ResponseCrafter" Version="1.0.4" />
+        <PackageReference Include="RedisRateLimiting.AspNetCore" Version="1.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\EasyRateLimiter\EasyRateLimiter.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\assets\css\panda-style.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\images\favicon.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\images\logo-wording.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\images\logo.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\js\docs.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
     </ItemGroup>
 
 </Project>

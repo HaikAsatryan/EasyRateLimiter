@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using EasyRateLimiter.Options;
 using EasyRateLimiter.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -14,10 +13,9 @@ public class IpRateLimitingMiddleware(
     ILogger<IpRateLimitingMiddleware> logger,
     RateLimitingService rateLimitingService)
 {
-    public async Task InvokeAsync(HttpContext context, ICacheRepository repository, RateLimiterOptions options)
+    public async Task InvokeAsync(HttpContext context, MemoryCacheRepository repository, RateLimiterOptions options)
     {
-        var sp = new Stopwatch();
-        sp.Start();
+        var nowTicks = DateTime.UtcNow.Ticks;
         if (options.EnableIpRateLimiting == false)
         {
             logger.LogWarning("IpRateLimitingMiddleware is disabled but still in the pipeline.");
@@ -30,7 +28,7 @@ public class IpRateLimitingMiddleware(
         var endpoint = $"{context.Request.Method}:{context.Request.Path}";
         endpoint = endpoint.ToLower();
 
-        if (await rateLimitingService.IsRateLimited(ipAddress, endpoint, true))
+        if (await rateLimitingService.IsRateLimited(ipAddress, endpoint, true, nowTicks))
         {
             if (options.HttpStatusCode == 0)
             {
@@ -42,9 +40,6 @@ public class IpRateLimitingMiddleware(
             return;
         }
 
-        sp.Stop();
-        // logger.LogInformation("IpRateLimiter middleware validated rate in {TotalMicroseconds} milliseconds",
-        //     sp.Elapsed.TotalMilliseconds); //todo only for testing delete at the end
         await next(context);
     }
 }

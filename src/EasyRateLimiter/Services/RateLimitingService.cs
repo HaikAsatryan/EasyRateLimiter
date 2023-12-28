@@ -5,20 +5,18 @@ namespace EasyRateLimiter.Services;
 
 public class RateLimitingService(RateLimiterOptions options, IRateValidator validator)
 {
-    public async Task<bool> IsRateLimited(string ipOrClientId, string endpoint, bool isIpRateLimiting)
+    public async Task<bool> IsRateLimited(string ipOrClientId, string endpoint, bool isIpRateLimiting, long nowTicks)
     {
-        var now = DateTime.UtcNow;
 
         if (WhitelistHelper.IsWhitelisted(ipOrClientId, endpoint, isIpRateLimiting, options))
         {
             return false;
         }
 
-        var isSpecificRateLimitedTask = validator.CheckRateLimitAsync(ipOrClientId, endpoint, now, false);
-        var isGloballyRateLimitedTask = validator.CheckRateLimitAsync(ipOrClientId, endpoint, now, true);
+        var isSpecificRateLimited = await validator.CheckRateLimitAsync(ipOrClientId, endpoint, nowTicks, false);
+        var isGloballyRateLimited = await validator.CheckRateLimitAsync(ipOrClientId, endpoint, nowTicks, true);
 
-        await Task.WhenAll(isSpecificRateLimitedTask, isGloballyRateLimitedTask);
 
-        return isSpecificRateLimitedTask.Result || isGloballyRateLimitedTask.Result;
+        return isSpecificRateLimited || isGloballyRateLimited;
     }
 }

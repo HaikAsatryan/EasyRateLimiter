@@ -4,10 +4,10 @@ namespace EasyRateLimiter.Helpers;
 
 public static class RuleCheckHelper
 {
-    public static bool RulesAreViolated(List<RateLimitRule> rules, string endpoint, List<DateTime> values,
-        DateTime now, bool globalRules)
+    public static bool RulesAreViolated(List<RateLimitRule> rules, string endpoint, List<long> ticks,
+        long nowTicks, bool globalRules)
     {
-        values.Sort();
+        ticks.Sort();
         List<RateLimitRule> cleanedRules = [];
 
         foreach (var rule in rules)
@@ -25,11 +25,11 @@ public static class RuleCheckHelper
         foreach (var rule in cleanedRules)
         {
             var count = 0;
-            var periodStart = now - rule.PeriodTimeSpan;
+            var periodStart = nowTicks - rule.PeriodTicks;
 
-            for (var i = values.Count - 1; i >= 0; i--)
+            for (var i = ticks.Count - 1; i >= 0; i--)
             {
-                if (values[i] < periodStart)
+                if (ticks[i] < periodStart)
                 {
                     break;
                 }
